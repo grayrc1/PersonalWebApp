@@ -1,0 +1,15 @@
+﻿@model IEnumerable<BlogPost>
+@{
+    ViewData["Title"] = "Blog";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@foreach (var post in Model)
+{
+    <div class="blog-post">
+        <h3>@post.Title</h3>
+        <p>@post.Content</p>
+        <p><small>Posted by @post.Author.UserName on @post.DateCreated</small></p>
+    </div>
+}
