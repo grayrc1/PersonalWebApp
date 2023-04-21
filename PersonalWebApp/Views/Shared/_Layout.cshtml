@@ -34,8 +34,28 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Blog" asp-action="Index">Blog</a>
                         </li>
+                        @await Component.InvokeAsync("CreateBlogPostLink")
                     </ul>
                 </div>
+                
+                @using Microsoft.AspNetCore.Identity
+                @inject SignInManager<IdentityUser> SignInManager
+                @{
+                    string userName = string.Empty;
+                    if (SignInManager.IsSignedIn(User))
+                    {
+                        userName = User.Identity.Name;
+                        <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="nav-item" id="logoutForm">
+                            <button type="submit" class="nav-link btn btn-link text-dark">
+                                Logout
+                            </button>
+                        </form>
+                    }
+                }
+                @if (!string.IsNullOrEmpty(userName))
+                {
+                    <span class="navbar-text">@userName</span>
+                }
             </div>
         </nav>
     </header>

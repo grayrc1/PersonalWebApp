@@ -15,11 +15,7 @@ namespace PersonalWebApp
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
                 builder.Configuration.GetConnectionString("DefaultConnection")));
-            /*builder.Services.AddIdentityCore<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
-                .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders();
-            */
+
             builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
             {
                 options.Password.RequireDigit = false;
@@ -30,9 +26,15 @@ namespace PersonalWebApp
             })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("CanWriteBlogPosts", policy => policy.RequireClaim("CanWriteBlogPosts"));
+            });
 
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
+
+
 
             var app = builder.Build();
 
@@ -49,9 +51,9 @@ namespace PersonalWebApp
 
             app.UseRouting();
 
-            app.UseAuthorization();
-
             app.UseAuthentication();
+
+            app.UseAuthorization();
 
             app.MapControllerRoute(
                 name: "default",

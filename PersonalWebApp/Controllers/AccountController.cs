@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PersonalWebApp.Models;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 public class AccountController : Controller
@@ -28,6 +29,15 @@ public class AccountController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
+        /*var u = new IdentityUser { UserName = "author1@example.com", Email = "author1@example.com" };
+        var r = await _userManager.CreateAsync(u, "123123");
+
+        if (r.Succeeded)
+        {
+            await _signInManager.SignInAsync(u, isPersistent: false);
+            await _userManager.AddClaimAsync(u, new Claim("CanWriteBlogPosts", "true"));
+        }*/
+
         if (ModelState.IsValid)
         {
             var user = new IdentityUser { UserName = model.Email, Email = model.Email };
@@ -35,6 +45,7 @@ public class AccountController : Controller
             if (result.Succeeded)
             {
                 await _signInManager.SignInAsync(user, isPersistent: false);
+                await _userManager.AddClaimAsync(user, new Claim("CanWriteBlogPosts", "true"));
                 return RedirectToAction("Index", "Home");
             }
             foreach (var error in result.Errors)
@@ -48,7 +59,7 @@ public class AccountController : Controller
 
     [HttpGet]
     [AllowAnonymous]
-    public IActionResult Login(string returnUrl = null)
+    public IActionResult Login(string returnUrl = "/")
     {
         ViewData["ReturnUrl"] = returnUrl;
         return View();
@@ -57,7 +68,7 @@ public class AccountController : Controller
     [HttpPost]
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
+    public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = "/")
     {
         ViewData["ReturnUrl"] = returnUrl;
         if (ModelState.IsValid)
