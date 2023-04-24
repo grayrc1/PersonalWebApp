@@ -46,6 +46,7 @@ public class AccountController : Controller
             {
                 await _signInManager.SignInAsync(user, isPersistent: false);
                 await _userManager.AddClaimAsync(user, new Claim("CanWriteBlogPosts", "true"));
+                await _userManager.AddToRoleAsync(user, "Admin");
                 return RedirectToAction("Index", "Home");
             }
             foreach (var error in result.Errors)

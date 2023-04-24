@@ -1,13 +1,14 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PersonalWebApp.Data;
+using Microsoft.Extensions.DependencyInjection;
 
 
 namespace PersonalWebApp
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +30,7 @@ namespace PersonalWebApp
             builder.Services.AddAuthorization(options =>
             {
                 options.AddPolicy("CanWriteBlogPosts", policy => policy.RequireClaim("CanWriteBlogPosts"));
+                options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
             });
 
             builder.Services.AddControllersWithViews();
@@ -37,6 +39,13 @@ namespace PersonalWebApp
 
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                await SeedRolesAsync(roleManager);
+            }
+            
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
@@ -61,5 +70,15 @@ namespace PersonalWebApp
 
             app.Run();
         }
+
+        private static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
+        {
+            if (!await roleManager.RoleExistsAsync("Admin"))
+            {
+                var adminRole = new IdentityRole("Admin");
+                await roleManager.CreateAsync(adminRole);
+            }
+        }
+
     }
 }

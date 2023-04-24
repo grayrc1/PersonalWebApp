@@ -1,5 +1,19 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@functions {
+    private async Task<bool> IsUserAdminAsync()
+    {
+        if (SignInManager.IsSignedIn(User))
+        {
+            var user = await UserManager.GetUserAsync(User);
+            return await UserManager.IsInRoleAsync(user, "Admin");
+        }
+        return false;
+    }
+}
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -35,11 +49,16 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Blog" asp-action="Index">Blog</a>
                         </li>
                         @await Component.InvokeAsync("CreateBlogPostLink")
+                        @if (SignInManager.IsSignedIn(User) && (await IsUserAdminAsync()))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Admin">Administration</a>
+                            </li>
+                        }
                     </ul>
                 </div>
                 
-                @using Microsoft.AspNetCore.Identity
-                @inject SignInManager<IdentityUser> SignInManager
+
                 @{
                     string userName = string.Empty;
                     if (SignInManager.IsSignedIn(User))
