@@ -1,6 +1,45 @@
-﻿@{
-    ViewData["Title"] = "Admin";
-}
+﻿@model List<AdminViewModel>
 
-<h1>Admin Page</h1>
-<p>Welcome to the administration page.</p>
+<h1>Admin</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Can Create Blog Post</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.UserName</td>
+                <td>
+                    <input type="checkbox" data-user-id="@user.Id" class="create-blog-post-checkbox" @(user.CanCreateBlogPost ? "checked" : "") />
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var checkboxes = document.querySelectorAll(".create-blog-post-checkbox");
+
+            checkboxes.forEach(function (checkbox) {
+                checkbox.addEventListener("change", function () {
+                    var userId = checkbox.getAttribute("data-user-id");
+                    var isChecked = checkbox.checked;
+
+                    fetch(`/Admin/UpdateCreateBlogPostClaim?userId=${userId}&canCreateBlogPost=${isChecked}`, {
+                        method: "POST",
+                        headers: {
+                            "RequestVerificationToken": document.getElementsByName("__RequestVerificationToken")[0].value
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+}
