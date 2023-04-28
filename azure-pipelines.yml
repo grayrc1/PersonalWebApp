@@ -35,6 +35,6 @@ steps:
     
 - task: PublishBuildArtifacts@1
   inputs:
-    pathtoPublish: '$(build.artifactStagingDirectory)'
-    artifactName: 'drop'
+    PathtoPublish: '$(build.artifactStagingDirectory)'
+    ArtifactName: 'drop'
 
