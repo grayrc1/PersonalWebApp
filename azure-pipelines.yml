@@ -24,7 +24,7 @@ steps:
 - task: VSBuild@1
   inputs:
     solution: '$(solution)'
-    msbuildArgs: '/p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
+    msbuildArgs: '/p:Configuration=$(buildConfiguration) /p:Platform=$(buildPlatform) /p:AppxBundlePlatforms="$(buildPlatform)" /p:AppxPackageDir="$(Build.ArtifactStagingDirectory)/AppxPackages" /p:AppxBundle=Always /p:UapAppxPackageBuildMode=StoreUpload /p:GenerateAppInstallerFile=true /p:AppInstallerUri=http://MyWebServer/Apps/ /p:AppxPackageSigningEnabled=true /p:PackageCertificateKeyFile="path\to\my\keyfile.pfx" /p:PackageCertificatePassword="$(mypassword)"'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
@@ -33,8 +33,15 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
     
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(build.artifactStagingDirectory)'
-    ArtifactName: 'drop'
 
+#- task: PublishBuildArtifacts@1
+#  inputs:
+#    PathtoPublish: '$(build.artifactStagingDirectory)'
+#    ArtifactName: 'drop'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: drop'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/AppxPackages'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
