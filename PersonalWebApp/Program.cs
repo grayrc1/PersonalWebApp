@@ -10,12 +10,16 @@ namespace PersonalWebApp
     {
         public static async Task Main(string[] args)
         {
+
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-            builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
-                builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            connectionString = connectionString.Replace("{DB_PASSWORD}", Environment.GetEnvironmentVariable("DB_PASSWORD"));
+
+            builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
             builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
             {
