@@ -15,6 +15,11 @@
         <span asp-validation-for="Email" class="text-danger"></span>
     </div>
     <div class="form-group">
+        <label asp-for="UserName" class="control-label">User Name</label>
+        <input asp-for="UserName" class="form-control" />
+        <span asp-validation-for="UserName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
         <label asp-for="Password" class="control-label">Password</label>
         <input asp-for="Password" class="form-control" />
         <span asp-validation-for="Password" class="text-danger"></span>
@@ -25,6 +30,29 @@
         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
     </div>
     <div class="form-group">
+        <label asp-for="Message"></label>
+        <input asp-for="Message" class="form-control" />
+        <span asp-validation-for="Message" class="text-danger"></span>
+    </div>
+    <div class="form-group">
         <button type="submit" class="btn btn-primary">Register</button>
     </div>
 </form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        window.addEventListener('load', function () {
+            var form = document.querySelector('form');
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                alert("Your registration request has been submitted. You will receive an email when your account is approved by the administrator.");
+                setTimeout(function () {
+                    form.submit();
+                }, 500);
+            });
+        });
+    </script>
+}

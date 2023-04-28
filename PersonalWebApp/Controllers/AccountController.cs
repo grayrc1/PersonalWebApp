@@ -29,24 +29,20 @@ public class AccountController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
-        /*var u = new IdentityUser { UserName = "author1@example.com", Email = "author1@example.com" };
-        var r = await _userManager.CreateAsync(u, "123123");
-
-        if (r.Succeeded)
-        {
-            await _signInManager.SignInAsync(u, isPersistent: false);
-            await _userManager.AddClaimAsync(u, new Claim("CanWriteBlogPosts", "true"));
-        }*/
 
         if (ModelState.IsValid)
         {
-            var user = new IdentityUser { UserName = model.Email, Email = model.Email };
+            var user = new IdentityUser { UserName = model.UserName, Email = model.Email };
             var result = await _userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
             {
-                await _signInManager.SignInAsync(user, isPersistent: false);
-                await _userManager.AddClaimAsync(user, new Claim("CanWriteBlogPosts", "true"));
-                await _userManager.AddToRoleAsync(user, "Admin");
+                if (!string.IsNullOrEmpty(model.Message))
+                {
+                    await _userManager.AddClaimAsync(user, new Claim("MessageToAdmin", model.Message));
+                }
+                //await _signInManager.SignInAsync(user, isPersistent: false);
+                //await _userManager.AddClaimAsync(user, new Claim("CanWriteBlogPosts", "true"));
+                //await _userManager.AddToRoleAsync(user, "Admin");
                 return RedirectToAction("Index", "Home");
             }
             foreach (var error in result.Errors)

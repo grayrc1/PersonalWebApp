@@ -7,6 +7,8 @@
         <tr>
             <th>User</th>
             <th>Can Create Blog Post</th>
+            <th>Email Confirmed</th>
+            <th>Message</th>
         </tr>
     </thead>
     <tbody>
@@ -17,6 +19,21 @@
                 <td>
                     <input type="checkbox" data-user-id="@user.Id" class="create-blog-post-checkbox" @(user.CanCreateBlogPost ? "checked" : "") />
                 </td>
+                <td>@user.EmailConfirmed</td>
+                @if (!user.EmailConfirmed)
+                {
+                    <td>@user.Message</td>
+                    <td>
+                        <form asp-action="ConfirmEmail" method="post" class="d-inline">
+                            <input type="hidden" asp-for="@user.Id" name="userId" />
+                            <button type="submit" class="btn btn-sm btn-primary">Approve Account</button>
+                        </form>
+                    </td>
+                }
+                else
+                {
+                    <td>@user.EmailConfirmed</td>
+                }
             </tr>
         }
     </tbody>

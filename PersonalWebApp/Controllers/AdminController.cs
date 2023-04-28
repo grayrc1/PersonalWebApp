@@ -26,11 +26,17 @@ namespace PersonalWebApp.Controllers
             {
                 var claims = await _userManager.GetClaimsAsync(user);
                 var canCreateBlogPost = claims.Any(c => c.Type == "CanCreateBlogPosts");
+
+                var messageClaim = claims.FirstOrDefault(c => c.Type == "MessageToAdmin");
+                var message = messageClaim?.Value;
+
                 model.Add(new AdminViewModel
                 {
                     Id = user.Id,
                     UserName = user.UserName,
-                    CanCreateBlogPost = canCreateBlogPost
+                    CanCreateBlogPost = canCreateBlogPost,
+                    EmailConfirmed = user.EmailConfirmed,
+                    Message = message
                 });
             }
 
@@ -53,7 +59,7 @@ namespace PersonalWebApp.Controllers
             else
             {
                 var claim = (await _userManager.GetClaimsAsync(user)).FirstOrDefault(c => c.Type == "CanWriteBlogPosts");
-                if (claim == null)
+                if (claim != null)
                 {
                     await _userManager.RemoveClaimAsync(user, claim);
                 }
@@ -61,5 +67,32 @@ namespace PersonalWebApp.Controllers
 
             return Ok();
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmEmail(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with Id '{userId}'");
+            }
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+
+            if (result.Succeeded)
+            {
+                //Possible TODO - automatically send email notifying new user
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        private async Task<bool> UserCanCreateBlogPostAsync(IdentityUser user)
+        {
+            var claim = new Claim("CanCreateBlogPost", "true");
+            var claims = await _userManager.GetClaimsAsync(user);
+            return claims.Contains(claim);
+        }
+
     }
 }
