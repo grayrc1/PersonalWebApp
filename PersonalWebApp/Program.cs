@@ -40,11 +40,11 @@ namespace PersonalWebApp
 
             var app = builder.Build();
 
-            using (var scope = app.Services.CreateScope())
+            /*using (var scope = app.Services.CreateScope())
             {
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
                 await SeedRolesAsync(roleManager);
-            }
+            }*/
             
 
             // Configure the HTTP request pipeline.
@@ -71,14 +71,14 @@ namespace PersonalWebApp
             app.Run();
         }
 
-        private static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
+        /*private static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
         {
             if (!await roleManager.RoleExistsAsync("Admin"))
             {
                 var adminRole = new IdentityRole("Admin");
                 await roleManager.CreateAsync(adminRole);
             }
-        }
+        }*/
 
     }
 }
