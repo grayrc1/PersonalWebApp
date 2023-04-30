@@ -17,7 +17,7 @@ namespace PersonalWebApp
             builder.Services.AddControllersWithViews();
 
             string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-            connectionString = connectionString.Replace("{DB_PASSWORD}", Environment.GetEnvironmentVariable("DB_PASSWORD"));
+            connectionString = connectionString.Replace("{DB_PASSWORD_NEW}", Environment.GetEnvironmentVariable("DB_PASSWORD_NEW"));
 
             builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
