@@ -13,12 +13,19 @@ namespace PersonalWebApp
 
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
+            {
+                config.AddEnvironmentVariables();
+            });
+
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-            string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-            connectionString = connectionString.Replace("{DB_PASSWORD_NEW}", Environment.GetEnvironmentVariable("DB_PASSWORD_NEW"));
+            string dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD", EnvironmentVariableTarget.Process);
+            Console.WriteLine($"DB_PASSWORD: {dbPassword}");
 
+            string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            connectionString = connectionString.Replace("{DB_PASSWORD}", Environment.GetEnvironmentVariable("DB_PASSWORD", EnvironmentVariableTarget.Process));
             builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
             builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
@@ -44,7 +51,9 @@ namespace PersonalWebApp
 
             var app = builder.Build();
 
-            /*using (var scope = app.Services.CreateScope())
+            /*
+             * Seed Roles
+             * using (var scope = app.Services.CreateScope())
             {
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
                 await SeedRolesAsync(roleManager);

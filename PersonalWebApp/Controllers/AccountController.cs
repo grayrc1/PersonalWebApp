@@ -40,9 +40,15 @@ public class AccountController : Controller
                 {
                     await _userManager.AddClaimAsync(user, new Claim("MessageToAdmin", model.Message));
                 }
-                await _signInManager.SignInAsync(user, isPersistent: false);
+                /*
+                 * Code for seeding initial admin user
+                //await _signInManager.SignInAsync(user, isPersistent: false);
                 //await _userManager.AddClaimAsync(user, new Claim("CanWriteBlogPosts", "true"));
-                await _userManager.AddToRoleAsync(user, "Admin");
+                //var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                //await _userManager.ConfirmEmailAsync(user, token);
+                //await _userManager.AddToRoleAsync(user, "Admin");
+                */
+
                 return RedirectToAction("Index", "Home");
             }
             foreach (var error in result.Errors)
@@ -70,16 +76,26 @@ public class AccountController : Controller
         ViewData["ReturnUrl"] = returnUrl;
         if (ModelState.IsValid)
         {
-            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
-            if (result.Succeeded)
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user != null) 
             {
-                return RedirectToLocal(returnUrl);
+                var result = await _signInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
+                if (result.Succeeded)
+                {
+                    return RedirectToLocal(returnUrl);
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    return View(model);
+                }
             }
             else
             {
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                 return View(model);
             }
+
         }
 
         return View(model);
