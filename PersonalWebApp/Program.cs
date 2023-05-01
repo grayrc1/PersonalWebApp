@@ -10,8 +10,28 @@ namespace PersonalWebApp
     {
         public static async Task Main(string[] args)
         {
+            /*var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            var configBuilder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{environmentName}.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables();
+
+            if (args != null)
+            {
+                configBuilder.AddCommandLine(args);
+            }
+
+            var config = configBuilder.Build();*/
 
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
+            {
+                var env = hostingContext.HostingEnvironment;
+                config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                      .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
+            });
 
             builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
             {
@@ -21,8 +41,8 @@ namespace PersonalWebApp
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-            string dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD", EnvironmentVariableTarget.Process);
-            Console.WriteLine($"DB_PASSWORD: {dbPassword}");
+            //string dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD", EnvironmentVariableTarget.Process);
+            //Console.WriteLine($"DB_PASSWORD: {dbPassword}");
 
             string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
             connectionString = connectionString.Replace("{DB_PASSWORD}", Environment.GetEnvironmentVariable("DB_PASSWORD", EnvironmentVariableTarget.Process));
